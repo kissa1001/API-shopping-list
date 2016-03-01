@@ -1,7 +1,8 @@
 var express = require('express');
-
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
+var _ = require('underscore');
+
 var Storage = function () {
     this.items = [];
     this.id = 0;
@@ -37,27 +38,37 @@ app.post('/items', jsonParser, function(req, res) {
 
 app.delete('/items/:id', function(req, res) {
     var itemId = req.params.id;
-    for (var i = 0 ; i < storage.items.length ; i++) {
-        if (storage.items[i].id == itemId) {
-            var item = storage.items[i];
-            res.status(201).json(item);
-            storage.items.splice(i, 1);
-            return res;
-        }
+
+    // find the item we want to delete
+    var item = _.find(storage.items, function(item){
+        return item.id == itemId;
+    });
+
+    // if the item exists, remove it from the storage
+    if (item) {
+        storage.items = _.filter(storage.items, function(item){
+            return item.id != itemId;
+        });
+        return res.status(200).json(item);
+    } else {
+        return res.sendStatus(404);
     }
-    return res.sendStatus(404);
 });
 
 app.put('/items/:id', jsonParser, function(req, res) {
     var itemId = req.params.id;
-    for (var i = 0 ; i < storage.items.length ; i++) {
-        if (storage.items[i].id == itemId) {
-            storage.items[i].name = req.body.name;
-            res.status(201).json(storage.items[i]);
-            return res;
-        }
+
+    var item = _.find(storage.items, function(item) {
+        return item.id == itemId;
+    });
+
+    if (item) {
+        item.name = req.body.name;
+        return res.status(200).json(item);
+    } else {
+        return res.sendStatus(404);
     }
-    return res.sendStatus(404);
+
 });
 
 app.listen(process.env.PORT || 8080);

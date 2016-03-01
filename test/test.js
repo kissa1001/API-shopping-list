@@ -82,16 +82,7 @@ describe('Shopping List', function() {
                 done();
             });
     });
-    it('should send a 404 when trying to delete an item that doesn\'t exist', function(done) {
-        chai.request(app)
-            .delete('/items/foo')
-            .send({'id': 'foo'})
-            .end(function(err, response) {
-                should.equal(err, null);
-                response.should.have.status(404);
-                done();
-            });
-    });
+
     it('should edit an item on put', function(done) {
         chai.request(app)
             .put('/items/1')
@@ -114,16 +105,6 @@ describe('Shopping List', function() {
                 storage.items[0].id.should.be.a('number');
                 storage.items[0].name.should.be.a('string');
                 storage.items[0].name.should.equal('Beets');
-                done();
-            });
-    });
-    it('should send a 404 when trying to put an item that doesn\'t exist', function(done) {
-        chai.request(app)
-            .put('/items/0')
-            .send({'id': '0', 'name': 'Beets'})
-            .end(function(err, response) {
-                should.equal(err, null);
-                response.should.have.status(404);
                 done();
             });
     });
